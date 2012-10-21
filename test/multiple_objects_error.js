@@ -27,9 +27,9 @@ var server = net.createServer(function(client) {
     });
     client.pipe(parser);
 });
-server.listen(9999);
+server.listen(0);
 
-var client = net.connect({ port : 9999 }, function() {
+var client = net.connect({ port : server.address().port }, function() {
     var msgs = str + '}';
     client.end(msgs);
 });
