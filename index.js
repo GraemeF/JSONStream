@@ -1,5 +1,6 @@
 var Parser = require('jsonparse')
   , Stream = require('stream').Stream
+  , Buffer = require('buffer-browserify').Buffer
 
 /*
 
