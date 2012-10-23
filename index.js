@@ -10,6 +10,25 @@ var Parser = require('jsonparse')
 
 */
 
+/*
+
+  In order to use jsonparse we need something that supports buf[index]
+  so check what works in the current environment.
+
+*/
+
+var isSafeToUseBuffer =
+  ('undefined' !== typeof Buffer) &&
+  (new Buffer('X')[0] === 88)
+
+var isSafeToUseInt32Array =
+  ('undefined' !== typeof Int32Array) &&
+  function(){
+    var buf = new Int32Array(1)
+    buf[0] = 42
+    return buf[0] === 42
+  }()
+
 exports.parse = function (path) {
 
   var stream = new Stream()
@@ -72,12 +91,12 @@ exports.parse = function (path) {
   stream.writable = true
   stream.write = function (chunk) {
     if('string' === typeof chunk) {
-      if ('undefined' === typeof Buffer) {
+      if (isSafeToUseBuffer) {
+        chunk = new Buffer(chunk)
+      } else {
         var buf = new Array(chunk.length)
         for (var i = 0; i < chunk.length; i++) buf[i] = chunk.charCodeAt(i)
-        chunk = new Int32Array(buf)
-      } else {
-        chunk = new Buffer(chunk)
+        chunk = isSafeToUseInt32Array ? new Int32Array(buf) : buf
       }
     }
     parser.write(chunk)
